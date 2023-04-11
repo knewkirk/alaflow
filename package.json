@@ -1,0 +1,25 @@
+{
+  "name": "alaflow",
+  "version": "0.0.1",
+  "description": "Publicity site for the musical artist Alaflow'",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knewkirk/alaflow.git"
+  },
+  "keywords": [
+    "music",
+    "alaflow",
+    "newkirk",
+    "friedline"
+  ],
+  "author": "Kyle Newkirk <kylednewkirk@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/knewkirk/alaflow/issues"
+  },
+  "homepage": "https://github.com/knewkirk/alaflow#readme"
+}
