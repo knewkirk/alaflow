@@ -59,10 +59,9 @@ module.exports = (env) => {
       new HtmlWebpackPlugin({
         template: './src/index.html',
       }),
-      // No static files yet
-      // new CopyPlugin({
-      //   patterns: [{ from: 'static', to: '' }],
-      // }),
+      new CopyPlugin({
+        patterns: [{ from: 'static', to: '' }],
+      }),
       new webpack.DefinePlugin({
         PRODUCTION: JSON.stringify(env.production),
         FIREBASE_API_KEY: JSON.stringify(`${process.env.FIREBASE_API_KEY}`),
