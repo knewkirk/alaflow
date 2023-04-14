@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 
+import Stats from 'three/examples/jsm/libs/stats.module.js';
+
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
@@ -21,12 +23,12 @@ export default class Three {
     const svg = await loader.loadAsync('/wordmark.svg');
     const material = new THREE.MeshStandardMaterial({
       color: 0xdddddd,
-      roughness: 0.6,
+      roughness: 0.3,
       metalness: 1,
     });
-    const SCALE = 0.0001;
+    const SCALE = 0.01;
     const OFFSET_X = 0;
-    const OFFSET_Y = 0.03;
+    const OFFSET_Y = 5;
 
     svg.paths.forEach((path, i) => {
       const shapes = path.toShapes(false);
@@ -36,6 +38,7 @@ export default class Three {
           bevelEnabled: false,
         });
         const mesh = new THREE.Mesh(geometry, material);
+        mesh.castShadow = true;
         svgGroup.add(mesh);
       });
     });
@@ -58,9 +61,9 @@ export default class Three {
     const material = new THREE.MeshPhongMaterial({
       color: 0x222222,
     });
-    const SCALE = 0.00008;
-    const WPADDING = 0.007;
-    const HPADDING = 0.0035;
+    const SCALE = 0.008;
+    const WPADDING = 0.8;
+    const HPADDING = 0.3;
 
     let svgGeo: THREE.ExtrudeGeometry;
     svg.paths.forEach((path, i, len) => {
@@ -110,7 +113,7 @@ export default class Three {
 
     const bufferGeo = mergeBufferGeometries(toMerge);
     bufferGeo.center();
-    bufferGeo.translate(0, 0.2, -0.1);
+    bufferGeo.translate(0, 15, -10);
     const mesh = new THREE.Mesh(bufferGeo, material);
 
     return mesh;
@@ -130,17 +133,17 @@ export default class Three {
     camera = new THREE.PerspectiveCamera(
       35,
       window.innerWidth / window.innerHeight,
-      0.1,
-      15
+      1,
+      1000
     );
-    camera.position.set(0, 0.2, 1.3);
+    camera.position.set(0, 10, 150);
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
-    scene.fog = new THREE.Fog(0x030303, 1, 4);
+    scene.fog = new THREE.Fog(0x111111, 90, 200);
 
     const plane = new THREE.Mesh(
-      new THREE.PlaneGeometry(80, 80),
+      new THREE.PlaneGeometry(400, 400),
       new THREE.MeshPhongMaterial({
         color: 0x111111,
         specular: 0x101010,
@@ -153,17 +156,23 @@ export default class Three {
     plane.castShadow = false;
     scene.add(plane);
 
-    const hemiLight = new THREE.HemisphereLight(0xaaaaaa, 0x111111);
-    hemiLight.intensity = 0.3;
-    scene.add(hemiLight);
-
     const spotLight = new THREE.SpotLight();
-    spotLight.penumbra = 0.5;
-    spotLight.position.set(-0.1, 0.2, 0.1);
+    spotLight.penumbra = 1;
+    spotLight.position.set(-20, 30, 70);
     spotLight.lookAt(0, 0, 0);
-    spotLight.intensity = 5;
+    spotLight.intensity = 2;
+    spotLight.angle = Math.PI / 8;
     spotLight.castShadow = true;
     scene.add(spotLight);
+
+    const spotLight2 = new THREE.SpotLight();
+    spotLight2.penumbra = 1;
+    spotLight2.position.set(20, 30, 70);
+    spotLight2.lookAt(0, 0, 0);
+    spotLight2.intensity = 2;
+    spotLight2.angle = Math.PI / 8;
+    spotLight2.castShadow = true;
+    scene.add(spotLight2);
 
     const wordMesh = await this.renderWordmark();
     wordMesh.castShadow = true;
@@ -175,11 +184,12 @@ export default class Three {
 
     const logo = await this.renderLogo();
     logo.castShadow = true;
+    logo.receiveShadow = true;
     scene.add(logo);
     logo.traverse((m) => selects.push(m));
     selects.push(logo);
 
-    const reflectorGeometry = new THREE.PlaneGeometry(10, 10);
+    const reflectorGeometry = new THREE.PlaneGeometry(200, 200);
     groundReflector = new ReflectorForSSRPass(reflectorGeometry, {
       clipBias: 0.0003,
       textureWidth: window.innerWidth,
@@ -194,15 +204,16 @@ export default class Three {
     groundReflector.receiveShadow = true;
     scene.add(groundReflector);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer({ antialias: false });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.BasicShadowMap;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.container.appendChild(renderer.domElement);
 
     controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 0.0635, 0);
+    controls.target.set(0, 10, 0);
+    controls.maxPolarAngle = Math.PI / 2;
     controls.update();
 
     composer = new EffectComposer(renderer);
@@ -210,8 +221,8 @@ export default class Three {
       renderer,
       scene,
       camera,
-      width: innerWidth,
-      height: innerHeight,
+      width: 200,
+      height: 200,
       groundReflector,
       selects,
     });
@@ -220,9 +231,7 @@ export default class Three {
     // TODO: figure out why > light gradient posterizing/banding
     // composer.addPass(new ShaderPass(GammaCorrectionShader));
 
-    gui.add(ssrPass, 'enabled');
-
-    ssrPass.opacity = 0.03;
+    ssrPass.opacity = 0.06;
     groundReflector.opacity = ssrPass.opacity;
     gui
       .add(ssrPass, 'opacity')
@@ -232,12 +241,19 @@ export default class Three {
       .onChange(() => {
         groundReflector.opacity = ssrPass.opacity;
       });
+
+    const stats = new Stats();
+    if (!PRODUCTION) {
+      this.container.append(stats.dom);
+    }
     if (PRODUCTION) {
       gui.hide();
     }
 
     renderer.setAnimationLoop(() => {
+      stats.begin();
       composer.render();
+      stats.end();
     });
   };
 }
