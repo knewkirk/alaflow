@@ -28,9 +28,13 @@
   },
   "homepage": "https://github.com/knewkirk/alaflow#readme",
   "dependencies": {
+    "@react-three/drei": "^9.65.3",
+    "@react-three/fiber": "^8.12.1",
+    "@react-three/postprocessing": "^2.7.1",
+    "leva": "^0.9.34",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "three": "^0.151.3"
+    "three": "^0.142.0"
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",
