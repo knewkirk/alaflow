@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
 
 import { MeshReflectorMaterial, OrbitControls } from '@react-three/drei';
-import { useControls } from 'leva';
+import { Leva, useControls } from 'leva';
 
 import './index.less';
 import Logo from '@components/Logo';
@@ -40,18 +40,21 @@ export default () => {
   };
 
   return (
-    <Canvas shadows camera={{ position: [0, 0.5, 6] }}>
-      <color attach="background" args={[0x333333]} />
-      <ambientLight intensity={0.3} />
-      <spotLight position={[3.5, 3, 4]} {...spotLightProps} />
-      <spotLight position={[-3.5, 3, 4]} {...spotLightProps} />
-      <Wordmark />
-      <Logo />
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[20, 20]} />
-        <MeshReflectorMaterial blur={[blurx, blury]} {...props} />
-      </mesh>
-      <OrbitControls maxPolarAngle={Math.PI / 2} target={[0, 0.5, 0]} />
-    </Canvas>
+    <>
+      <Canvas shadows camera={{ position: [0, 0.5, 6] }}>
+        <color attach="background" args={[0x333333]} />
+        <ambientLight intensity={0.3} />
+        <spotLight position={[3.5, 3, 4]} {...spotLightProps} />
+        <spotLight position={[-3.5, 3, 4]} {...spotLightProps} />
+        <Wordmark />
+        <Logo />
+        <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[20, 20]} />
+          <MeshReflectorMaterial blur={[blurx, blury]} {...props} />
+        </mesh>
+        <OrbitControls maxPolarAngle={Math.PI / 2} target={[0, 0.5, 0]} />
+      </Canvas>
+      <Leva hidden={PRODUCTION} />
+    </>
   );
 };
