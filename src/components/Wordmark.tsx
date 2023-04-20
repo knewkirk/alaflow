@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
 
+const SCALE = 0.01;
+
 export default () => {
-  const SCALE = 0.01;
   const svg = useLoader(SVGLoader, '/wordmark-sm.svg');
   const [shapes, setShapes] = useState([]);
   const [centerX, setCenterX] = useState(0);
@@ -40,7 +41,12 @@ export default () => {
       castShadow
     >
       <extrudeGeometry args={[shapes, { depth: 20 }]} />
-      <meshStandardMaterial color={0xffffff} roughness={0.3} metalness={1} />
+      <meshStandardMaterial
+        color={0xffffff}
+        roughness={0.3}
+        metalness={1}
+        toneMapped={false}
+      />
     </mesh>
   );
 };

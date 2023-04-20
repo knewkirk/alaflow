@@ -2,8 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
-
 import { useTimer } from 'use-timer';
+import { useControls } from 'leva';
+
+import useAnimation from '@hooks/useAnimation';
 
 const NUM_ROWS = 5;
 const NUM_COLS = 10;
@@ -11,7 +13,40 @@ const SCALE = 0.001;
 const WPADDING = 0.08;
 const HPADDING = 0.03;
 
+const useEmissiveWave = (
+  refMap: React.RefObject<Record<string, THREE.MeshStandardMaterial>>,
+  shouldRun: boolean
+) => {
+  for (let i = 0; i < NUM_COLS; i++) {
+    for (let j = 0; j < NUM_ROWS; j++) {
+      useAnimation(
+        {
+          amplitude: 6,
+          enabled: shouldRun,
+          offset: 0.2 * i - 0.2 * j,
+          peakiness: 5,
+        },
+        (y) => {
+          const idx = `${i}${j}`;
+          if (!refMap.current.hasOwnProperty(idx)) {
+            return;
+          }
+          refMap.current[idx].emissiveIntensity = y;
+        }
+      );
+    }
+  }
+};
+
 export default () => {
+  const { logoColor } = useControls('colors', {
+    logoColor: { value: '#3d9999' },
+  });
+  const animationArgs = useControls('animation', {
+    'logo colors': true,
+    'logo random spin': true,
+  });
+
   const svg = useLoader(SVGLoader, '/logo.svg');
   const [geometry, setGeometry] = useState<THREE.ExtrudeGeometry>(
     new THREE.ExtrudeGeometry()
@@ -19,27 +54,26 @@ export default () => {
   const [geometryRot, setGeometryRot] = useState<THREE.ExtrudeGeometry>(
     new THREE.ExtrudeGeometry()
   );
-
   const [tGeo, setTGeo] = useState<THREE.ShapeGeometry>(
     new THREE.ShapeGeometry()
   );
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
 
-  // Use refs for things we don't want to trigger a react render for
   const meshRef = useRef<Record<string, THREE.Mesh>>({});
   const isSpinning = useRef(false);
   const clickedIdx = useRef('');
   const didUpdate = useRef(false);
   const logoUpdateCount = useRef(0);
+  const materialRef = useRef<Record<string, THREE.MeshStandardMaterial>>({});
+
+  useEmissiveWave(materialRef, animationArgs['logo colors']);
 
   const { time, start, pause, reset, status } = useTimer();
-  useFrame((state, delta) => {
+  useFrame(() => {
     const idx = clickedIdx.current;
     if (status === 'STOPPED' && !isSpinning.current) {
       start();
-      // TODO: Remove if doing the random thing
-      pause();
     }
     if (status === 'PAUSED' && isSpinning.current) {
       if (!meshRef.current || !idx || !meshRef.current.hasOwnProperty(idx)) {
@@ -48,20 +82,20 @@ export default () => {
 
       meshRef.current[idx].rotation.y += 0.15;
       if (meshRef.current[idx].rotation.y >= 2 * Math.PI) {
-        // reset();
         meshRef.current[idx].rotation.y = 0;
         clickedIdx.current = '';
         isSpinning.current = false;
-        // start();
+        if (animationArgs['logo random spin']) {
+          reset();
+          start();
+        }
       }
     }
-    // TODO: Figure out if the randomness thing good idea
     if (status === 'RUNNING' && !isSpinning.current) {
-      if (time < 0) {
+      if (time > 5 && animationArgs['logo random spin']) {
         pause();
-        const rand1 = Math.trunc(Math.random() * NUM_COLS);
-        const rand2 = Math.trunc(Math.random() * NUM_ROWS);
-        console.log('spinning:', `${rand1}${rand2}`);
+        const rand1 = 1 + Math.trunc(Math.random() * (NUM_COLS - 1));
+        const rand2 = 1 + Math.trunc(Math.random() * (NUM_ROWS - 1));
         clickedIdx.current = `${rand1}${rand2}`;
         isSpinning.current = true;
       }
@@ -124,7 +158,7 @@ export default () => {
         const box = new THREE.Box3().setFromObject(group);
         const center = box.getCenter(new THREE.Vector3());
         group.position.x = -center.x;
-        group.position.y = -center.y + 1.5;
+        group.position.y = -center.y + 1.2;
         didUpdate.current = true;
       }}
       // TODO: Figure out why this is necessary
@@ -150,15 +184,22 @@ export default () => {
                 if (isSpinning.current) {
                   return;
                 }
+                pause();
                 clickedIdx.current = `${i}${j}`;
                 isSpinning.current = true;
               }}
               geometry={(i + j) % 2 === 1 ? geometry : geometryRot}
             >
               <meshStandardMaterial
-                color={0x555555}
-                roughness={0.4}
+                color={0x333333}
+                // color={0xffffff}
+                roughness={0.3}
                 metalness={1}
+                // emissive={0x3d9999}
+                emissiveIntensity={0}
+                emissive={logoColor}
+                toneMapped={false}
+                ref={(r) => (materialRef.current[`${i}${j}`] = r)}
               />
               <mesh
                 geometry={tGeo}
