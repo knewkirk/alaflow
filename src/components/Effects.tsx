@@ -10,33 +10,43 @@ import { useControls } from 'leva';
 
 import useAnimation from '@hooks/useAnimation';
 
-const CHROMA_OFFSET = 0.005;
-
 export default () => {
   const { bloom, chroma } = useControls('animation', {
     bloom: true,
     chroma: true,
   });
 
-  const bloomProps = useControls('bloom', {
-    intensity: { value: 0, min: 0, max: 2 },
-    width: { value: 100, min: 0, max: 1000 },
-    height: { value: 1000, min: 0, max: 1000 },
-    kernelSize: {
-      value: KernelSize.LARGE,
-      options: [
-        KernelSize.HUGE,
-        KernelSize.VERY_LARGE,
-        KernelSize.LARGE,
-        KernelSize.MEDIUM,
-        KernelSize.SMALL,
-        KernelSize.VERY_SMALL,
-      ],
+  const { offset } = useControls(
+    'chroma',
+    {
+      offset: { value: 0.01, min: 0, max: 0.02 },
     },
-    luminanceThreshold: { value: 1, min: 0, max: 2 },
-    luminanceSmoothing: { value: 0.9, min: 0, max: 1 },
-    mipmapBlur: { value: false },
-  }, { collapsed: true });
+    { collapsed: true }
+  );
+
+  const bloomProps = useControls(
+    'bloom',
+    {
+      intensity: { value: 0, min: 0, max: 2 },
+      width: { value: 100, min: 0, max: 1000 },
+      height: { value: 1000, min: 0, max: 1000 },
+      kernelSize: {
+        value: KernelSize.LARGE,
+        options: [
+          KernelSize.HUGE,
+          KernelSize.VERY_LARGE,
+          KernelSize.LARGE,
+          KernelSize.MEDIUM,
+          KernelSize.SMALL,
+          KernelSize.VERY_SMALL,
+        ],
+      },
+      luminanceThreshold: { value: 1, min: 0, max: 2 },
+      luminanceSmoothing: { value: 0.9, min: 0, max: 1 },
+      mipmapBlur: { value: false },
+    },
+    { collapsed: true }
+  );
 
   const bloomRef = useRef(null);
   const chromaRef = useRef(null);
@@ -45,8 +55,8 @@ export default () => {
     bloomRef.current.intensity = y;
     bloomRef.current.luminanceThreshold = 1 - 0.5 * y;
   });
-  useAnimation({ enabled: chroma, amplitude: CHROMA_OFFSET }, (y) => {
-    const val = CHROMA_OFFSET - y;
+  useAnimation({ enabled: chroma, amplitude: offset }, (y) => {
+    const val = offset - y;
     chromaRef.current.offset = new THREE.Vector2(val, val);
   });
 
@@ -56,7 +66,7 @@ export default () => {
       <ChromaticAberration
         blendFunction={BlendFunction.NORMAL} // blend mode
         ref={(r) => (chromaRef.current = r)}
-        offset={new THREE.Vector2(CHROMA_OFFSET, CHROMA_OFFSET)}
+        offset={new THREE.Vector2(offset, offset)}
       />
     </EffectComposer>
   );

@@ -45,6 +45,7 @@ export default () => {
   const animationArgs = useControls('animation', {
     'logo colors': true,
     'logo random spin': true,
+    'logo spin speed': { value: 0.4, min: 0.15, max: 0.5 },
   });
 
   const svg = useLoader(SVGLoader, '/logo.svg');
@@ -80,7 +81,7 @@ export default () => {
         return;
       }
 
-      meshRef.current[idx].rotation.y += 0.15;
+      meshRef.current[idx].rotation.y += animationArgs['logo spin speed'];
       if (meshRef.current[idx].rotation.y >= 2 * Math.PI) {
         meshRef.current[idx].rotation.y = 0;
         clickedIdx.current = '';
@@ -171,7 +172,7 @@ export default () => {
               position={[
                 i * (width / 2 + WPADDING),
                 j * (height + HPADDING),
-                -0.5,
+                -6.5,
               ]}
               key={`${i}${j}`}
               castShadow
@@ -192,10 +193,8 @@ export default () => {
             >
               <meshStandardMaterial
                 color={0x333333}
-                // color={0xffffff}
                 roughness={0.3}
                 metalness={1}
-                // emissive={0x3d9999}
                 emissiveIntensity={0}
                 emissive={logoColor}
                 toneMapped={false}

@@ -36,7 +36,7 @@ export default () => {
   return (
     <mesh
       scale={SCALE}
-      position={[-centerX, centerY + 0.4, 0]}
+      position={[-centerX, centerY + 0.4, -6]}
       rotation={[Math.PI, 0, 0]}
       castShadow
     >
