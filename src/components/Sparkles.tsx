@@ -13,7 +13,7 @@ export default () => {
       random: true,
       amount: { value: 100, min: 0, max: 150 },
       noise: { value: 0.5, min: 0, max: 1 },
-      scale: { value: 12, min: 1, max: 20 },
+      scale: { value: 10, min: 1, max: 20 },
     },
     { collapsed: true }
   );
