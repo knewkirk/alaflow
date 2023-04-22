@@ -5,7 +5,7 @@ import { useControls } from 'leva';
 
 export default () => {
   const { blurx, blury, ...props } = useControls(
-    'mirror',
+    'ground',
     {
       blurx: { value: 1, min: 0, max: 1 },
       blury: { value: 1, min: 0, max: 1 },

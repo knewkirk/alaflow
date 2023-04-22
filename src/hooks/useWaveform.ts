@@ -30,20 +30,24 @@ export default (
   }: Params,
   callback: (y: number) => void
 ) => {
-  const args = useControls('animation', {
-    all: true,
-    'force on': false,
-  });
+  const args = useControls(
+    'animation',
+    {
+      pause: false,
+      forceOn: false,
+    },
+    { collapsed: true }
+  );
 
   const last = useRef(0);
   useFrame(({ clock }) => {
-    if (args['force on']) {
+    if (args.forceOn) {
       callback(amplitude);
       return;
     }
 
     const t = clock.getElapsedTime();
-    if (!enabled || t < offset || !args.all) {
+    if (!enabled || t < offset || args.pause) {
       callback(last.current);
       return;
     }
