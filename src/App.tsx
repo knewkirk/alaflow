@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -6,14 +6,13 @@ import { OrbitControls } from '@react-three/drei';
 import { Leva, useControls } from 'leva';
 
 import './index.less';
-// import Lights from '@components/Lights';
-// import Logo from '@components/Front/Logo';
-// import Wordmark from '@components/Wordmark';
 import Front from '@components/Front';
 import Effects from '@components/Effects';
 import Ground from '@components/Ground';
 import Sparkles from '@components/Sparkles';
 import Right from '@components/Right';
+import { Physics } from '@react-three/rapier';
+import Ball from '@components/Ball';
 
 export default () => {
   let devMode = false;
@@ -60,21 +59,32 @@ export default () => {
         camera={{ position: [0, 0.5, 0] }}
         dpr={window.devicePixelRatio}
       >
-        <color
-          attach="background"
-          args={[0x000000]}
-        />
-        <ambientLight intensity={0.3} />
-        <Ground />
-        <Front />
-        <Right />
-        <Sparkles />
-        <OrbitControls
-          target={target}
-          reverseOrbit={reverseOrbit}
-          dampingFactor={0.1}
-        />
-        <Effects />
+        <Suspense>
+          <Physics
+            gravity={[0, -3, 0]}
+            interpolate={false}
+            colliders={false}
+            debug={false}
+          >
+            <color
+              attach="background"
+              args={[0x000000]}
+            />
+            <ambientLight intensity={0.3} />
+            <Ground />
+            <Ball position={[6, 1, -6]} />
+            <Ball position={[-6, 1, -6]} />
+            <Front />
+            <Right />
+            <Sparkles />
+            <OrbitControls
+              target={target}
+              reverseOrbit={reverseOrbit}
+              dampingFactor={0.1}
+            />
+            <Effects />
+          </Physics>
+        </Suspense>
       </Canvas>
       <Leva hidden={PRODUCTION && !devMode} />
     </>

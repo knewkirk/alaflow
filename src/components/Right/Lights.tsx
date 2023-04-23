@@ -51,3 +51,44 @@ export default () => {
     </>
   );
 };
+
+/*
+Tried to get logo shadows going, weird scaling issues and
+get too blurry to look good, especially with the chroma effect
+
+const Shadow = () => {
+  const shadowProps = useControls('shadows', {
+    distance: { value: 0.36, min: 0, max: 1 },
+    alphaTest: { value: 0.1, min: 0, max: 1 },
+    scale: { value: 1.2, min: 0, max: 5 },
+    width: { value: 1024, min: 0, max: 5024 },
+    height: { value: 1224, min: 0, max: 5024 },
+  });
+  const [tx, setTx] = useState(new THREE.Texture());
+  const [mat, setMat] = useState(null);
+  const logoTexture = useTexture('/logo-black-bg.png');
+
+  const png = useLoader(THREE.TextureLoader, '/logo-black-bg.png');
+
+  useEffect(() => {
+    if (!png) {
+      return;
+    }
+    png.wrapS = THREE.RepeatWrapping;
+    png.wrapT = THREE.RepeatWrapping;
+    png.repeat.set(6, 6);
+    png.needsUpdate = true;
+    const mat = new THREE.MeshStandardMaterial({ map: png });
+    // setMat(mat);
+    // setTx(png);
+  }, [png]);
+
+  return (
+    <SpotLightShadow
+      map={png}
+      // map={png}
+      {...shadowProps}
+    />
+  );
+};
+*/

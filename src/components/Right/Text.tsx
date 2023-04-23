@@ -1,7 +1,8 @@
 import React from 'react';
 import * as THREE from 'three';
-import { Center, Float, Text3D } from '@react-three/drei';
+import { Center, Float, Text3D, useTexture } from '@react-three/drei';
 import { folder, useControls } from 'leva';
+import { useLoader } from '@react-three/fiber';
 
 const LINKS = [
   {
@@ -19,17 +20,6 @@ const LINKS = [
 ];
 
 export default () => {
-  /****
-   *
-   *
-   *
-   * MAKE A `FRONT` FOLDER NOW
-   *
-   *
-   *
-   *
-   */
-
   const {
     floatEnabled,
     color,
@@ -82,7 +72,19 @@ export default () => {
           speed={speed}
           receiveShadow
           castShadow
+          onClick={onClick(l.url)}
         >
+          <mesh
+            rotation={[0, -Math.PI / 2, 0]}
+            position={[6, 2 - i * 0.8, 0]}
+          >
+            <planeGeometry args={[3.5]} />
+            <meshBasicMaterial
+              color="red"
+              transparent
+              opacity={0}
+            />
+          </mesh>
           <Center
             position={[6, 2 - i * 0.8, 0]}
             receiveShadow
@@ -92,7 +94,6 @@ export default () => {
               font={`/fonts/${font}.json`}
               rotation={[0, -Math.PI / 2, 0]}
               scale={scale}
-              onClick={onClick(l.url)}
               receiveShadow
               castShadow
             >

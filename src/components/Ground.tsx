@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import * as THREE from 'three';
 import { MeshReflectorMaterial } from '@react-three/drei';
 import { useControls } from 'leva';
+import { RigidBody } from '@react-three/rapier';
 
 export default () => {
   const { blurx, blury, ...props } = useControls(
@@ -26,9 +27,17 @@ export default () => {
   );
 
   return (
-    <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[20, 20]} />
-      <MeshReflectorMaterial blur={[blurx, blury]} {...props} />
-    </mesh>
+    <RigidBody colliders="cuboid">
+      <mesh
+        receiveShadow
+        rotation={[-Math.PI / 2, 0, 0]}
+      >
+        <planeGeometry args={[20, 20]} />
+        <MeshReflectorMaterial
+          blur={[blurx, blury]}
+          {...props}
+        />
+      </mesh>
+    </RigidBody>
   );
 };

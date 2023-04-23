@@ -35,6 +35,7 @@ export default (
     {
       pause: false,
       forceOn: false,
+      forceOff: false,
     },
     { collapsed: true }
   );
@@ -43,6 +44,10 @@ export default (
   useFrame(({ clock }) => {
     if (args.forceOn) {
       callback(amplitude);
+      return;
+    }
+    if (args.forceOff) {
+      callback(0);
       return;
     }
 
