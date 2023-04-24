@@ -11,6 +11,7 @@ import Effects from '@components/Effects';
 import Ground from '@components/Ground';
 import Sparkles from '@components/Sparkles';
 import Right from '@components/Right';
+import Left from '@components/Left';
 import { Physics } from '@react-three/rapier';
 import Ball from '@components/Ball';
 
@@ -21,11 +22,12 @@ export default () => {
     devMode = !!params.get('dev');
   }
 
-  const { reverseOrbit, lookAtRight } = useControls(
+  const { reverseOrbit, lookAtRight, lookAtLeft } = useControls(
     'camera',
     {
       reverseOrbit: true,
       lookAtRight: false,
+      lookAtLeft: false,
     },
     { collapsed: true }
   );
@@ -39,18 +41,22 @@ export default () => {
       y = 0.501;
       if (lookAtRight) {
         x = 0.01;
+      } else if (lookAtLeft) {
+        x = -0.01;
       } else {
         z = -0.01;
       }
     } else {
       if (lookAtRight) {
         x = 6;
+      } else if (lookAtLeft) {
+        x = -6;
       } else {
         z = -6;
       }
     }
     setTarget(new THREE.Vector3(x, y, z));
-  }, [reverseOrbit, lookAtRight]);
+  }, [reverseOrbit, lookAtRight, lookAtLeft]);
 
   return (
     <>
@@ -76,6 +82,7 @@ export default () => {
             <Ball position={[-6, 1, -6]} />
             <Front />
             <Right />
+            <Left />
             <Sparkles />
             <OrbitControls
               target={target}
