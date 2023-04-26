@@ -31,7 +31,7 @@ export default () => {
       reverseOrbit: true,
       lookAtRight: false,
       lookAtLeft: false,
-      lookAtBack: true,
+      lookAtBack: false,
     },
     { collapsed: true }
   );
