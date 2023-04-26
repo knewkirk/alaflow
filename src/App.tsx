@@ -12,8 +12,11 @@ import Ground from '@components/Ground';
 import Sparkles from '@components/Sparkles';
 import Right from '@components/Right';
 import Left from '@components/Left';
+import Back from '@components/Back';
 import { Physics } from '@react-three/rapier';
 import Ball from '@components/Ball';
+import Blob from '@components/Blob';
+
 
 export default () => {
   let devMode = false;
@@ -22,12 +25,13 @@ export default () => {
     devMode = !!params.get('dev');
   }
 
-  const { reverseOrbit, lookAtRight, lookAtLeft } = useControls(
+  const { reverseOrbit, lookAtRight, lookAtLeft, lookAtBack } = useControls(
     'camera',
     {
       reverseOrbit: true,
       lookAtRight: false,
       lookAtLeft: false,
+      lookAtBack: true,
     },
     { collapsed: true }
   );
@@ -43,6 +47,8 @@ export default () => {
         x = 0.01;
       } else if (lookAtLeft) {
         x = -0.01;
+      } else if (lookAtBack) {
+        z = 0.01;
       } else {
         z = -0.01;
       }
@@ -51,12 +57,16 @@ export default () => {
         x = 6;
       } else if (lookAtLeft) {
         x = -6;
+      } else if (lookAtBack) {
+        z = 6;
       } else {
         z = -6;
       }
     }
     setTarget(new THREE.Vector3(x, y, z));
   }, [reverseOrbit, lookAtRight, lookAtLeft]);
+
+  const [controlsEnabled, setControlsEnabled] = useState(true);
 
   return (
     <>
@@ -80,11 +90,15 @@ export default () => {
             <Ground />
             <Ball position={[6, 1, -6]} />
             <Ball position={[-6, 1, -6]} />
+            <Blob position={[6, 1.5, 6]} />
+            <Blob position={[-6, 1.5, 6]} />
             <Front />
             <Right />
             <Left />
+            <Back />
             <Sparkles />
             <OrbitControls
+              enabled={controlsEnabled}
               target={target}
               reverseOrbit={reverseOrbit}
               dampingFactor={0.1}
