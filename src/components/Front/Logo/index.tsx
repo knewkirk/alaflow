@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
@@ -8,6 +8,9 @@ import { useTimer } from 'use-timer';
 import { useEmissiveWave, useRotation } from './animations';
 import * as c from './constants';
 import useGeometry from './useGeometry';
+
+const o = new THREE.Object3D()
+// const c = new THREE.Color()
 
 export default () => {
   const logoProps = useControls(
@@ -50,73 +53,102 @@ export default () => {
     logoProps.spinSpeed
   );
 
-  return (
-    <group
-      onUpdate={(group) => {
-        if (
-          didUpdate.current ||
-          logoUpdateCount.current < c.NUM_COLS * c.NUM_ROWS
-        ) {
-          return;
+  const ref = useRef<THREE.InstancedMesh>();
+  const [length, setLength] = useState(20);
+
+  useLayoutEffect(() => {
+    if (!ref.current) { return }
+    let i = 0
+    const root = Math.round(Math.pow(length, 1 / 3))
+    const halfRoot = root / 2
+    for (let x = 0; x < root; x++)
+      for (let y = 0; y < root; y++)
+        for (let z = 0; z < root; z++) {
+          const id = i++
+          o.rotation.set(Math.random(), Math.random(), Math.random())
+          o.position.set(halfRoot - x + Math.random(), halfRoot - y + Math.random(), halfRoot - z + Math.random())
+          o.updateMatrix()
+          ref.current.setMatrixAt(id, o.matrix)
         }
-        const box = new THREE.Box3().setFromObject(group);
-        const center = box.getCenter(new THREE.Vector3());
-        group.position.x = -center.x;
-        group.position.y = -center.y + 1.2;
-        didUpdate.current = true;
-      }}
-      // TODO: Figure out why this is necessary
-      onAfterRender={() => {}}
-    >
-      {[...Array(c.NUM_COLS)].map((_, i) => (
-        <React.Fragment key={i}>
-          {[...Array(c.NUM_ROWS)].map((_, j) => (
-            <mesh
-              position={[
-                i * (width / 2 + c.WPADDING),
-                j * (height + c.HPADDING),
-                -6.5,
-              ]}
-              key={`${i}${j}`}
-              castShadow
-              receiveShadow
-              ref={(r) => (meshRef.current[`${i}${j}`] = r)}
-              onAfterRender={() => {
-                logoUpdateCount.current++;
-              }}
-              onPointerDown={() => {
-                if (isSpinning.current) {
-                  return;
-                }
-                timer.pause();
-                clickedIdx.current = `${i}${j}`;
-                isSpinning.current = true;
-              }}
-              geometry={(i + j) % 2 === 1 ? geometry : geometryRot}
-            >
-              <meshStandardMaterial
-                color={0x333333}
-                roughness={0.3}
-                metalness={1}
-                emissiveIntensity={0}
-                emissive={logoProps.color}
-                toneMapped={false}
-                ref={(r) => (materialRef.current[`${i}${j}`] = r)}
-              />
+    ref.current.instanceMatrix.needsUpdate = true
+    // Re-use geometry + instance matrix
+    // outlines.current.geometry = ref.current.geometry
+    // outlines.current.instanceMatrix = ref.current.instanceMatrix
+  }, [length])
+
+  if (true) {
+    <instancedMesh ref={ref} args={[null, null, length]} geometry={geometry} position={[0, 2, -4]}>
+      <meshBasicMaterial color={'blue'}/>
+    </instancedMesh>
+  } else {
+    return (
+      <group
+        onUpdate={(group) => {
+          if (
+            didUpdate.current ||
+            logoUpdateCount.current < c.NUM_COLS * c.NUM_ROWS
+          ) {
+            return;
+          }
+          const box = new THREE.Box3().setFromObject(group);
+          const center = box.getCenter(new THREE.Vector3());
+          group.position.x = -center.x;
+          group.position.y = -center.y + 1.2;
+          didUpdate.current = true;
+        }}
+        // TODO: Figure out why this is necessary
+        onAfterRender={() => {}}
+      >
+        {[...Array(c.NUM_COLS)].map((_, i) => (
+          <React.Fragment key={i}>
+            {[...Array(c.NUM_ROWS)].map((_, j) => (
               <mesh
-                geometry={tGeo}
-                rotation={[0, 0, (i + j) % 2 === 1 ? Math.PI : 0]}
+                position={[
+                  i * (width / 2 + c.WPADDING),
+                  j * (height + c.HPADDING),
+                  -6.5,
+                ]}
+                key={`${i}${j}`}
+                castShadow
+                receiveShadow
+                ref={(r) => (meshRef.current[`${i}${j}`] = r)}
+                onAfterRender={() => {
+                  logoUpdateCount.current++;
+                }}
+                onPointerDown={() => {
+                  if (isSpinning.current) {
+                    return;
+                  }
+                  timer.pause();
+                  clickedIdx.current = `${i}${j}`;
+                  isSpinning.current = true;
+                }}
+                geometry={(i + j) % 2 === 1 ? geometry : geometryRot}
               >
-                <meshBasicMaterial
-                  color="red"
-                  opacity={0}
-                  transparent
+                <meshStandardMaterial
+                  color={0x333333}
+                  roughness={0.3}
+                  metalness={1}
+                  emissiveIntensity={0}
+                  emissive={logoProps.color}
+                  toneMapped={false}
+                  ref={(r) => (materialRef.current[`${i}${j}`] = r)}
                 />
+                <mesh
+                  geometry={tGeo}
+                  rotation={[0, 0, (i + j) % 2 === 1 ? Math.PI : 0]}
+                >
+                  <meshBasicMaterial
+                    color="red"
+                    opacity={0}
+                    transparent
+                  />
+                </mesh>
               </mesh>
-            </mesh>
-          ))}
-        </React.Fragment>
-      ))}
-    </group>
-  );
+            ))}
+          </React.Fragment>
+        ))}
+      </group>
+    );
+  }
 };
