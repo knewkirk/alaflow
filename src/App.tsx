@@ -2,7 +2,7 @@ import React, { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
 
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, Stats } from '@react-three/drei';
 import { Leva, useControls } from 'leva';
 
 import './index.less';
@@ -16,7 +16,6 @@ import Back from '@components/Back';
 import { Physics } from '@react-three/rapier';
 import Ball from '@components/Ball';
 import Blob from '@components/Blob';
-
 
 export default () => {
   let devMode = false;
@@ -66,14 +65,12 @@ export default () => {
     setTarget(new THREE.Vector3(x, y, z));
   }, [reverseOrbit, lookAtRight, lookAtLeft]);
 
-  const [controlsEnabled, setControlsEnabled] = useState(true);
-
   return (
     <>
       <Canvas
         shadows
         camera={{ position: [0, 0.5, 0] }}
-        dpr={window.devicePixelRatio}
+        dpr={[1, 2]}
       >
         <Suspense>
           <Physics
@@ -98,7 +95,6 @@ export default () => {
             <Back />
             <Sparkles />
             <OrbitControls
-              enabled={controlsEnabled}
               target={target}
               reverseOrbit={reverseOrbit}
               dampingFactor={0.1}
@@ -108,6 +104,7 @@ export default () => {
         </Suspense>
       </Canvas>
       <Leva hidden={PRODUCTION && !devMode} />
+      {(!PRODUCTION || devMode) && <Stats />}
     </>
   );
 };
