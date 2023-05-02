@@ -10,27 +10,6 @@ export default () => {
   const speedY = useRef(0);
   const meshRef = useRef(new THREE.Mesh());
 
-  const { lambda, dt, scale, roughness, color } = useControls('back', {
-    spinner: folder(
-      {
-        lambda: { value: 0.3, min: 0, max: 1 },
-        dt: { value: 0.07, min: 0, max: 0.1 },
-        scale: { value: 1.5, min: 1, max: 3 },
-        roughness: { value: 0.08, min: 0, max: 0.2 },
-        color: { value: '#ffbb9c' },
-      },
-      { collapsed: true }
-    ),
-  });
-
-  const cubeCamProps = useControls({
-    cubeCam: folder({
-      resolution: { value: 128, min: 0, max: 1024 },
-      near: { value: 1, min: 0, max: 5 },
-      far: { value: 12, min: 0, max: 100 },
-    }),
-  });
-
   const onClick = (e: ThreeEvent<PointerEvent>) => {
     const f = 15;
     const midY = 1.5;
@@ -45,8 +24,8 @@ export default () => {
     const currentX = meshRef.current.rotation.x;
     const currentY = meshRef.current.rotation.y;
     const currentZ = meshRef.current.rotation.z;
-    speedX.current = damp(speedX.current, 0, lambda, dt);
-    speedY.current = damp(speedY.current, 0, lambda, dt);
+    speedX.current = damp(speedX.current, 0, 0.3, 0.07);
+    speedY.current = damp(speedY.current, 0, 0.3, 0.07);
     if (Math.abs(speedX.current) < 0.0001) {
       speedX.current = 0;
     }
@@ -61,27 +40,29 @@ export default () => {
   });
 
   return (
-      <CubeCamera
-        position={[0, 2, 6]}
-        frames={1}
-        {...cubeCamProps}
-      >
-        {
-          ((texture: THREE.Texture) => (
-            <mesh
-              onClick={onClick}
-              ref={(r) => (meshRef.current = r)}
-            >
-              <icosahedronGeometry args={[scale]} />
-              <meshStandardMaterial
-                color={color}
-                metalness={1}
-                roughness={roughness}
-                envMap={texture}
-              />
-            </mesh>
-          )) as any
-        }
-      </CubeCamera>
+    <CubeCamera
+      position={[0, 2, 6]}
+      frames={1}
+      resolution={128}
+      near={1}
+      far={12}
+    >
+      {
+        ((texture: THREE.Texture) => (
+          <mesh
+            onClick={onClick}
+            ref={(r) => (meshRef.current = r)}
+          >
+            <icosahedronGeometry args={[1.5]} />
+            <meshStandardMaterial
+              color={'#ffbb9c'}
+              metalness={1}
+              roughness={0.08}
+              envMap={texture}
+            />
+          </mesh>
+        )) as any
+      }
+    </CubeCamera>
   );
 };

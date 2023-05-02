@@ -15,7 +15,8 @@ export default () => {
     {
       logo: folder(
         {
-          color: { value: '#3d9999' },
+          // color: { value: '#3d9999' },
+          color: { value: '#64ffff' },
           animateGlow: true,
           spinRandom: true,
           spinSpeed: { value: 0.4, min: 0.15, max: 0.5 },

@@ -49,7 +49,7 @@ export default () => {
           },
           luminanceThreshold: { value: 1, min: 0, max: 2 },
           luminanceSmoothing: { value: 0.9, min: 0, max: 1 },
-          mipmapBlur: { value: false },
+          mipmapBlur: { value: true },
         },
         { collapsed: true }
       ),
@@ -60,7 +60,7 @@ export default () => {
   const bloomRef = useRef(null);
   const chromaRef = useRef(null);
 
-  useWaveform({ enabled: bloomProps.enabled && animateBloom }, (y) => {
+  useWaveform({ enabled: bloomProps.enabled && animateBloom, once: true }, (y) => {
     bloomRef.current.intensity = y;
     bloomRef.current.luminanceThreshold = 1 - 0.5 * y;
   });
@@ -68,6 +68,7 @@ export default () => {
     {
       enabled: chromaProps.enabled && animateChroma,
       amplitude: chromaProps.offset,
+      once: true,
     },
     (y) => {
       const val = Math.max(0, chromaProps.offset - y * 1.5);

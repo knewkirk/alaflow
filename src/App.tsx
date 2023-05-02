@@ -17,6 +17,8 @@ import { Physics } from '@react-three/rapier';
 import Ball from '@components/Ball';
 import Blob from '@components/Blob';
 
+const POLAR_ANGLE_JUST_GT_HORIZ = 6 * Math.PI / 11;
+
 export default () => {
   let devMode = false;
   if (typeof window !== 'undefined') {
@@ -35,12 +37,14 @@ export default () => {
     { collapsed: true }
   );
 
+  const [minAngle, setMinAngle] = useState(POLAR_ANGLE_JUST_GT_HORIZ);
   const [target, setTarget] = useState(new THREE.Vector3());
   useEffect(() => {
     let x = 0;
     let y = 0.5;
     let z = 0;
     if (reverseOrbit) {
+      setMinAngle(POLAR_ANGLE_JUST_GT_HORIZ);
       y = 0.501;
       if (lookAtRight) {
         x = 0.01;
@@ -52,6 +56,7 @@ export default () => {
         z = -0.01;
       }
     } else {
+      setMinAngle(0);
       if (lookAtRight) {
         x = 6;
       } else if (lookAtLeft) {
@@ -98,12 +103,13 @@ export default () => {
               target={target}
               reverseOrbit={reverseOrbit}
               dampingFactor={0.1}
+              minPolarAngle={minAngle}
             />
             <Effects />
           </Physics>
         </Suspense>
       </Canvas>
-      <Leva hidden={PRODUCTION && !devMode} />
+      <Leva hidden={PRODUCTION && !devMode} collapsed/>
       {(!PRODUCTION || devMode) && <Stats />}
     </>
   );

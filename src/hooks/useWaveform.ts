@@ -8,7 +8,11 @@ interface Params {
   amplitude?: number;
   enabled?: boolean;
   peakiness?: number;
+  once?: boolean;
 }
+
+// finish loading everything first
+const WAIT = 3;
 
 /**
  * Oscillate between 0 and params.amplitude, starting at 0
@@ -19,6 +23,7 @@ interface Params {
  * @params.peakiness - How "peaky" the graph is
  *  (automatically raises to an even power and adjusts amp & freq)
  * @params.enabled - Self explanatory
+ * @params.once - only run one time to the peak. don't wanna get irritating
  */
 export default (
   {
@@ -27,6 +32,7 @@ export default (
     period = 10,
     offset = 0,
     enabled = true,
+    once,
   }: Params,
   callback: (y: number) => void
 ) => {
@@ -41,17 +47,18 @@ export default (
   );
 
   const last = useRef(0);
+  const didReachPeak = useRef(false);
   useFrame(({ clock }) => {
-    if (args.forceOn) {
+    const t = clock.getElapsedTime() - WAIT;
+    if (args.forceOn || (once && didReachPeak.current)) {
       callback(amplitude);
       return;
     }
-    if (args.forceOff) {
+    if (args.forceOff || t < 0) {
       callback(0);
       return;
     }
 
-    const t = clock.getElapsedTime();
     if (!enabled || t < offset || args.pause) {
       callback(last.current);
       return;
@@ -69,5 +76,8 @@ export default (
     }
     last.current = y;
     callback(y);
+    if (Math.abs(y - amplitude) < 0.000001) {
+      didReachPeak.current = true;
+    }
   });
 };

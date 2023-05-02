@@ -13,7 +13,8 @@ export const useEmissiveWave = (
     for (let j = 0; j < c.NUM_ROWS; j++) {
       useWaveform(
         {
-          amplitude: 6,
+          // amplitude: 6,
+          amplitude: 2,
           enabled: shouldRun,
           offset: 0.2 * i - 0.2 * j,
           peakiness: 5,

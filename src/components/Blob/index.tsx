@@ -12,17 +12,6 @@ interface Props {
 }
 
 export default ({ position }: Props) => {
-  const {
-    intensity,
-    distance,
-  } = useControls({
-    points: folder({
-      centerScale: { value: 0.5, min: 0, max: 1 },
-      intensity: { value: 5, min: 0, max: 10 },
-      distance: { value: 2.5, min: 0, max: 10 },
-    }),
-  });
-
   const meshRef = useRef<THREE.Mesh>();
   const clicked = useRef(false);
   const peaked = useRef(false);
@@ -107,8 +96,8 @@ export default ({ position }: Props) => {
       enabled={false}
     >
       <pointLight
-        intensity={intensity}
-        distance={distance}
+        intensity={5}
+        distance={2.5}
         ref={lightRef}
       />
       <mesh
