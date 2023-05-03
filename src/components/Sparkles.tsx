@@ -1,5 +1,4 @@
 import React from 'react';
-import * as THREE from 'three';
 import { Sparkles } from '@react-three/drei';
 import { useMemo } from 'react';
 

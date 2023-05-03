@@ -1,5 +1,4 @@
 import React from 'react';
-import * as THREE from 'three';
 import { Center, Float, Text3D } from '@react-three/drei';
 
 const LINKS = [

@@ -1,5 +1,4 @@
-import React, { useRef } from 'react';
-import * as THREE from 'three';
+import React from 'react';
 import { MeshReflectorMaterial } from '@react-three/drei';
 import { useControls } from 'leva';
 import { RigidBody } from '@react-three/rapier';

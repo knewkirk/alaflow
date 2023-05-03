@@ -1,9 +1,8 @@
 import { CubeCamera } from '@react-three/drei';
-import { ThreeEvent, useFrame, useLoader } from '@react-three/fiber';
+import { ThreeEvent, useFrame } from '@react-three/fiber';
 import React, { useRef } from 'react';
 import * as THREE from 'three';
 import { damp } from 'three/src/math/MathUtils';
-import { folder, useControls } from 'leva';
 
 export default () => {
   const speedX = useRef(0);

@@ -1,5 +1,4 @@
 import { SpotLight } from '@react-three/drei';
-import { folder, useControls } from 'leva';
 import React, { useState } from 'react';
 import * as THREE from 'three';
 

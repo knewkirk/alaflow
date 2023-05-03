@@ -1,6 +1,5 @@
-import { Float, useTexture } from '@react-three/drei';
+import { Float } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { folder, useControls } from 'leva';
 import React, { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
