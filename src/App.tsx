@@ -109,7 +109,7 @@ export default () => {
           </Physics>
         </Suspense>
       </Canvas>
-      <Leva hidden={PRODUCTION && !devMode} collapsed/>
+      <Leva hidden={PRODUCTION && !devMode} collapsed={true}/>
       {(!PRODUCTION || devMode) && <Stats />}
     </>
   );
