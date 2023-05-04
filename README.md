@@ -4,12 +4,10 @@
 ## About
 [alaflow-music.web.app](alaflow-music.web.app)
 
+## Installation
+`yarn`
+
 ## Developement
-
-`> npm run build`
-
--or-
-
 `> npm run watch`
 
 -and-
