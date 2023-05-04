@@ -7,6 +7,9 @@
 ## Installation
 `yarn`
 
+You may also need to install firebase tools to serve locally (and potentially deploy/stage)
+`curl -sL https://firebase.tools | bash`
+
 ## Developement
 `> npm run watch`
 
