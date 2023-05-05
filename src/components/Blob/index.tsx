@@ -5,22 +5,58 @@ import * as THREE from 'three';
 
 import lerpColor from '@lib/lerpColor';
 import { vertexShader, fragmentShader } from './shaders';
+import { folder, useControls } from 'leva';
 
 interface Props {
   position: THREE.Vector3Tuple;
 }
 
 export default ({ position }: Props) => {
+  const {
+    intensity,
+    distance,
+    colorALight,
+    colorADark,
+    colorBLight,
+    colorBDark,
+  } = useControls(
+    'blobs',
+    {
+      intensity: { value: 5, min: 0, max: 10 },
+      distance: { value: 2.5, min: 0, max: 10 },
+      colorALight: { value: '#ffc9b0' },
+      colorADark: { value: '#ff9666' },
+      colorBLight: { value: '#a3ffff' },
+      colorBDark: { value: '#4affff' },
+    },
+    { collapsed: true }
+  );
+
   const meshRef = useRef<THREE.Mesh>();
   const clicked = useRef(false);
   const peaked = useRef(false);
   const toggleColor = useRef(false);
   const lightRef = useRef(new THREE.PointLight());
 
-  const lightOrange = new THREE.Color('#ffc9b0');
-  const darkOrange = new THREE.Color('#ff9666');
-  const lightTeal = new THREE.Color('#a3ffff');
-  const darkTeal = new THREE.Color('#4affff');
+  const lightOrange = useMemo(
+    () => new THREE.Color(colorALight as any),
+    [colorALight]
+  );
+  const darkOrange = useMemo(
+    () => new THREE.Color(colorADark as any),
+    [colorADark]
+  );
+  const lightTeal = useMemo(
+    () => new THREE.Color(colorBLight as any),
+    [colorBLight]
+  );
+  const darkTeal = useMemo(
+    () => new THREE.Color(colorBDark as any),
+    [colorBDark]
+  );
+  // const darkOrange = new THREE.Color('#ff9666');
+  // const lightTeal = new THREE.Color('#a3ffff');
+  // const darkTeal = new THREE.Color('#4affff');
 
   const uniforms = useMemo(
     () => ({
@@ -72,16 +108,20 @@ export default ({ position }: Props) => {
       .u_colorB.value;
     const currentLight = lightRef.current.color;
     if (toggleColor.current) {
-      (meshRef.current.material as THREE.ShaderMaterial).uniforms.u_colorA.value =
-        lerpColor(currentA, darkTeal, 0.05);
-      (meshRef.current.material as THREE.ShaderMaterial).uniforms.u_colorB.value =
-        lerpColor(currentB, lightTeal, 0.05);
+      (
+        meshRef.current.material as THREE.ShaderMaterial
+      ).uniforms.u_colorA.value = lerpColor(currentA, darkTeal, 0.05);
+      (
+        meshRef.current.material as THREE.ShaderMaterial
+      ).uniforms.u_colorB.value = lerpColor(currentB, lightTeal, 0.05);
       lightRef.current.color = lerpColor(currentLight, lightTeal, 0.05);
     } else {
-      (meshRef.current.material as THREE.ShaderMaterial).uniforms.u_colorA.value =
-        lerpColor(currentA, darkOrange, 0.05);
-      (meshRef.current.material as THREE.ShaderMaterial).uniforms.u_colorB.value =
-        lerpColor(currentB, lightOrange, 0.05);
+      (
+        meshRef.current.material as THREE.ShaderMaterial
+      ).uniforms.u_colorA.value = lerpColor(currentA, darkOrange, 0.05);
+      (
+        meshRef.current.material as THREE.ShaderMaterial
+      ).uniforms.u_colorB.value = lerpColor(currentB, lightOrange, 0.05);
       lightRef.current.color = lerpColor(currentLight, lightOrange, 0.05);
     }
   });
@@ -95,8 +135,8 @@ export default ({ position }: Props) => {
       enabled={false}
     >
       <pointLight
-        intensity={5}
-        distance={2.5}
+        intensity={intensity}
+        distance={distance}
         ref={lightRef}
       />
       <mesh

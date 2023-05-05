@@ -1,10 +1,26 @@
 import { CubeCamera } from '@react-three/drei';
 import { ThreeEvent, useFrame } from '@react-three/fiber';
+import { folder, useControls } from 'leva';
 import React, { useRef } from 'react';
 import * as THREE from 'three';
 import { damp } from 'three/src/math/MathUtils';
 
 export default () => {
+  const { color, metalness, roughness } = useControls(
+    'back',
+    {
+      material: folder(
+        {
+          color: { value: '#ffbb9c' },
+          metalness: { value: 1, min: 0, max: 1 },
+          roughness: { value: 0.1, min: 0, max: 1 },
+        },
+        { collapsed: true }
+      ),
+    },
+    { collapsed: true }
+  );
+
   const speedX = useRef(0);
   const speedY = useRef(0);
   const meshRef = useRef(new THREE.Mesh());
@@ -54,9 +70,9 @@ export default () => {
           >
             <icosahedronGeometry args={[1.5]} />
             <meshStandardMaterial
-              color={'#ffbb9c'}
-              metalness={1}
-              roughness={0.08}
+              color={color}
+              metalness={metalness}
+              roughness={roughness}
               envMap={texture}
             />
           </mesh>

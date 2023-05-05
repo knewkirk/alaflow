@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { RapierRigidBody, RigidBody } from '@react-three/rapier';
-import { useControls } from 'leva';
+import { folder, useControls } from 'leva';
 
 interface Props {
   position: THREE.Vector3Tuple;
@@ -11,12 +11,32 @@ export default ({ position }: Props) => {
   const { color, metalness, roughness } = useControls(
     'ball',
     {
-      color: { value: '#ffbb9c' },
-      metalness: { value: 1, min: 0, max: 1 },
-      roughness: { value: 0.35, min: 0, max: 1 },
+      material: folder(
+        {
+          color: { value: '#ffbb9c' },
+          metalness: { value: 1, min: 0, max: 1 },
+          roughness: { value: 0.35, min: 0, max: 1 },
+        },
+        { collapsed: true }
+      ),
     },
     { collapsed: true }
   );
+
+  const spotLightProps = useControls('ball', {
+    light: folder(
+      {
+        color: { value: '#ffbb9c' },
+        intensity: { value: 2, min: 0, max: 10 },
+        attenuation: { value: 0.8, min: 0, max: 2 },
+        distance: { value: 3, min: 0, max: 10 },
+        angle: { value: 1.1, min: 0, max: 4 },
+        penumbra: { value: 1.8, min: 0, max: 4 },
+        anglePower: { value: 10, min: 0, max: 20 },
+      },
+      { collapsed: true }
+    ),
+  });
 
   const rigidBodyRef = useRef<RapierRigidBody>(null);
 
@@ -31,19 +51,6 @@ export default ({ position }: Props) => {
       true
     );
   };
-
-  const spotLightProps = useMemo(
-    () => ({
-      color: '#ffbb9c',
-      intensity: 2,
-      attenuation: 0.8,
-      distance: 3,
-      angle: 1.1,
-      penumbra: 1.8,
-      anglePower: 10,
-    }),
-    []
-  );
 
   const [target] = useState(() => new THREE.Object3D());
 
