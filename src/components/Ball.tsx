@@ -1,53 +1,24 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-
 import { RapierRigidBody, RigidBody } from '@react-three/rapier';
-import { useFrame } from '@react-three/fiber';
-import { Wireframe } from '@react-three/drei';
-import { folder, useControls } from 'leva';
+import { useControls } from 'leva';
 
 interface Props {
   position: THREE.Vector3Tuple;
 }
 
 export default ({ position }: Props) => {
-  const wireframeProps = useControls(
+  const { color, metalness, roughness } = useControls(
     'ball',
     {
-      wireframe: folder(
-        {
-          stroke: { value: '#3d9999' as any },
-          backfaceStroke: { value: '#49ffff' as any },
-          fill: { value: '#e29775' as any },
-          fillOpacity: { value: 0.4, min: 0, max: 1 },
-          fillMix: { value: 1, min: 0, max: 1 },
-          thickness: { value: 0.2, min: 0, max: 0.3 },
-          squeeze: { value: false },
-          precision: {
-            value: 'highp' as any,
-            options: ['highp', 'medp', 'lowp'],
-          },
-        },
-        { collapsed: true }
-      ),
+      color: { value: '#ffbb9c' },
+      metalness: { value: 1, min: 0, max: 1 },
+      roughness: { value: 0.35, min: 0, max: 1 },
     },
     { collapsed: true }
   );
 
-  const lightProps = useControls('ball', {
-    light: folder(
-      {
-        color: { value: '#ffbb9c' },
-        intensity: { value: 10, min: 0, max: 10 },
-        distance: { value: 1.5, min: 0, max: 10 },
-      },
-      { collapsed: true }
-    ),
-  });
-
   const rigidBodyRef = useRef<RapierRigidBody>(null);
-  const geoRef = useRef<THREE.IcosahedronGeometry>(null);
-  const lightRef = useRef<THREE.PointLight>(null);
 
   const onClick = () => {
     const fac = 0.03;
@@ -61,20 +32,31 @@ export default ({ position }: Props) => {
     );
   };
 
-  useFrame(() => {
-    const { x, y, z } = rigidBodyRef.current.nextTranslation();
+  const spotLightProps = useMemo(
+    () => ({
+      color: '#ffbb9c',
+      intensity: 2,
+      attenuation: 0.8,
+      distance: 3,
+      angle: 1.1,
+      penumbra: 1.8,
+      anglePower: 10,
+    }),
+    []
+  );
 
-    if (!lightRef.current) {
-      return;
-    }
-    lightRef.current.position.set(x, y, z);
-  });
+  const [target] = useState(() => new THREE.Object3D());
 
   return (
     <>
-      <pointLight
-        ref={(r) => (lightRef.current = r)}
-        {...lightProps}
+      <spotLight
+        position={[position[0], 3, position[2]]}
+        target={target}
+        {...spotLightProps}
+      />
+      <primitive
+        object={target}
+        position={[position[0], 0, position[2]]}
       />
       <RigidBody
         position={position}
@@ -85,11 +67,12 @@ export default ({ position }: Props) => {
           onClick={onClick}
           castShadow
         >
-          <icosahedronGeometry
-            args={[0.7]}
-            ref={(r) => (geoRef.current = r)}
+          <icosahedronGeometry args={[0.7]} />
+          <meshStandardMaterial
+            color={color}
+            metalness={metalness}
+            roughness={roughness}
           />
-          <Wireframe {...(wireframeProps as any)} />
         </mesh>
       </RigidBody>
     </>

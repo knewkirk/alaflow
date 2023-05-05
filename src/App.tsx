@@ -41,6 +41,7 @@ export default () => {
             <color
               attach="background"
               args={[0x000000]}
+              // args={[0xbbbbbb]}
             />
             <ambientLight intensity={0.3} />
             <Ground />

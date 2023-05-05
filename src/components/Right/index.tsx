@@ -1,11 +1,22 @@
 import React from 'react';
 
 import Lights from './Lights';
-import Text from './Text';
+import Icon, { IconType } from './Icon';
 
 export default () => (
   <>
     <Lights />
-    <Text />
+    <Icon
+      type={IconType.Spotify}
+      position={[6, 2, 0]}
+    />
+    <Icon
+      type={IconType.Soundcloud}
+      position={[6, 1, -1.5]}
+    />
+    <Icon
+      type={IconType.Instagram}
+      position={[6, 1, 1.5]}
+    />
   </>
 );

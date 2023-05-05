@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader';
@@ -6,12 +6,20 @@ import { useTimer } from 'use-timer';
 
 import * as c from './constants';
 import useGeometry from './useGeometry';
-import useWaveform from '@hooks/useWaveform';
+import { folder, useControls } from 'leva';
 
 const tempObj1 = new THREE.Object3D();
 const tempObj2 = new THREE.Object3D();
 
 export default () => {
+  const logoMaterialProps = useControls('front', {
+    logo: folder({
+      color: { value: '#444444' },
+      roughness: { value: 0.3, min: 0, max: 1 },
+      metalness: { value: 1, min: 0, max: 1 },
+    }, { collapsed: true }),
+  });
+
   const svg = useLoader(SVGLoader, '/logo.svg');
   const { geometry, width, height, tGeo } = useGeometry(svg);
 
@@ -22,18 +30,11 @@ export default () => {
 
   const logoMesh = useRef<THREE.InstancedMesh>();
   const clickTgtMesh = useRef<THREE.InstancedMesh>();
-  const matRef = useRef<THREE.MeshPhongMaterial>();
-  const [didLoad, setDidLoad] = useState(false);
-
-  useWaveform({ amplitude: 1.7 }, (y) => {
-    matRef.current.emissiveIntensity = y;
-  });
 
   useFrame(() => {
     if (
       !logoMesh.current ||
       !geometry ||
-      !matRef.current ||
       !clickTgtMesh.current
     ) {
       return;
@@ -82,10 +83,6 @@ export default () => {
       }
     }
     logoMesh.current.instanceMatrix.needsUpdate = true;
-    logoMesh.current.onAfterRender = () => {
-      setDidLoad(true);
-    };
-
     clickTgtMesh.current.instanceMatrix.needsUpdate = true;
 
     if (!isSpinning.current) {
@@ -104,20 +101,12 @@ export default () => {
     >
       <instancedMesh
         ref={logoMesh}
-        args={[
-          geometry,
-          null,
-          c.NUM_COLS * c.NUM_ROWS,
-        ]}
+        args={[null, null, c.NUM_COLS * c.NUM_ROWS]}
+        geometry={geometry}
       >
-        <meshPhongMaterial
-          color={'#004843'}
-          emissive={'#64ffff'}
-          emissiveIntensity={0}
+        <meshStandardMaterial
           toneMapped={false}
-          transparent
-          opacity={didLoad ? 1 : 0}
-          ref={matRef}
+          {...logoMaterialProps}
         />
       </instancedMesh>
 
@@ -134,8 +123,3 @@ export default () => {
     </group>
   );
 };
-/*
-
-
-      <meshBasicMaterial color={"#ffaa33"} opacity={1} transparent/>
-*/

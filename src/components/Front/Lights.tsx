@@ -42,6 +42,7 @@ export default () => {
             y: { value: 2, min: 0, max: 5 },
             z: { value: 2.5, min: 0, max: 5 },
           }),
+          opacity: { value: 0.15, min: 0, max: 1}
         },
         { collapsed: true }
       ),

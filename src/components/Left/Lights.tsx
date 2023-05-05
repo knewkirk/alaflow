@@ -12,6 +12,7 @@ export default () => {
       penumbra: 1.8,
       anglePower: 10,
       intensity: 0.7,
+      opacity: 0.15,
     }),
     []
   );
