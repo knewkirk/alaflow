@@ -54,9 +54,6 @@ export default ({ position }: Props) => {
     () => new THREE.Color(colorBDark as any),
     [colorBDark]
   );
-  // const darkOrange = new THREE.Color('#ff9666');
-  // const lightTeal = new THREE.Color('#a3ffff');
-  // const darkTeal = new THREE.Color('#4affff');
 
   const uniforms = useMemo(
     () => ({

@@ -4,12 +4,11 @@ import React, { useState } from 'react';
 import * as THREE from 'three';
 
 export default () => {
-  const { x, y, z, animate, ...spotLightProps } = useControls(
+  const { x, y, z, ...spotLightProps } = useControls(
     'back',
     {
       lights: folder(
         {
-          animate: true,
           color: { value: '#ffbb9c' },
           intensity: { value: 20, min: 0, max: 30 },
           attenuation: { value: 0.8, min: 0, max: 2 },
