@@ -2,7 +2,7 @@
 *🎶 The musical act of the century 🎶*
 
 ## About
-[alaflow-music.web.app](alaflow-music.web.app)
+[alaflow.com](https://alaflow.com)
 
 ## Installation
 `yarn`
